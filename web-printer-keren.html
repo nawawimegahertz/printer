@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thermal Printer Control</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+  <div class="bg-white p-8 rounded-lg shadow-md w-96">
+    <h1 class="text-2xl font-bold text-gray-800 text-center mb-6">Thermal Printer Control</h1>
+    
+    <textarea id="printText" rows="4" placeholder="Enter text to print..." class="w-full p-4 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+
+    <div class="flex justify-between">
+      <button id="connectButton" class="w-full py-2 px-4 mr-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none">Connect to Printer</button>
+      <button id="printButton" class="w-full py-2 px-4 ml-2 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none">Print</button>
+    </div>
+  </div>
+
+  <script>
+    let port;
+    let writer;
+
+    document.getElementById('connectButton').addEventListener('click', async () => {
+      try {
+        // Request port and open a connection.
+        port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 19200 });
+        writer = port.writable.getWriter();
+        alert('Connected to printer');
+      } catch (error) {
+        console.error('Error connecting to printer:', error);
+        alert('Failed to connect to printer');
+      }
+    });
+
+    document.getElementById('printButton').addEventListener('click', async () => {
+      if (writer) {
+        let text = document.getElementById('printText').value;
+        let encoder = new TextEncoder();
+        await writer.write(encoder.encode(text + '\n'));
+        alert('Text sent to printer');
+      } else {
+        alert('Printer not connected');
+      }
+    });
+  </script>
+
+</body>
+</html>
